@@ -1,8 +1,8 @@
-﻿# BioSeqMixer
+﻿# bseq-kit
 
 ## Overview
 
-BioSeqMixer is a mini-program that allows the user to work with nucleotide and amino acid sequences, as well as fastq format data. This tool contains three semantic and functional blocks:
+***bseq-kit*** is a mini-program that allows the user to work with nucleotide and amino acid sequences, as well as fastq format data. This tool contains three semantic and functional blocks:
 
 ### :round_pushpin: run_dna_rna_tools
 Block for working with nucleotide sequences. It can converts a DNA/RNA sequence into its reverse, complement, reverse-complement form, or translate to its trancribe form.
@@ -21,7 +21,9 @@ import run_tools
 ```
 And then run the required function, adding its name and input arguments after the dot, for example:
 ```python
-run_tools.run_dna_rna_tools('ATGC', operation = 'complement')
+run_tools.run_dna_rna_tools('ATGC', operation = 'complement')  # command
+
+'TAcG'  # result
 ```
 
 ### :inbox_tray: Input
@@ -117,7 +119,7 @@ run_tools.run_fastq_tools(seqs = {
 Each program block contains its own implementable operations.
 
 
-### run_dna_rna_tools  
+#### run_dna_rna_tools  
 
  -   `transcribe`  
  
@@ -136,7 +138,7 @@ Convert nucleotide (DNA/RNA) sequence into complement sequence.
 
 Convert nucleotide (DNA/RNA) sequence into complement sequence and reverse it.
 
-### run_amino_acid_tools  
+#### run_amino_acid_tools  
 
 -   `calculate_molecular_weight`
 
@@ -146,15 +148,34 @@ Calculate the molecular weight of the input amino acid sequences based on the ma
 
 Calculate the percentage of each amino acid in the sequence. The input is a string with amino acid sequence. The output is the percentage of each amino acid in the sequence (the result is rounded to two decimal places).
 
-### run_fastq_tools  
+- `calculate_pI`
 
--   `gc_bounds`  Composition GC interval (in percent) for filtering. Default is `tuple` (0, 100). When passing a single number as an argument, it is considered an upper bound. For example, `gc_bounds = (20, 80)` save only reads with GC content from 20 to 80%, `gc_bounds = 50`  save reads with GC content less than or equal to 50%.
+Calculate the isoelectric point of amino acid sequences. The function operation is based on the formula for determining the isoelectric point:
+
+$$pI = \dfrac{(pK_1 + pK_2 + ... + pK_n)}{n},$$
+
+where $pK$ is dissociation constant of free $NH_2$ and $COOH$ radicals in amino acids.
+The output is the value of the isoelectric point of aminoacids sequence (the result is rounded to two decimal places).
+
+- `calculate_hydrophobicity_eisenberg`
+
+Calculate estimation of hydrophilicity/hydrophobicity of amino acid sequences. The function operation is based on the Einzenberg hydrophilicity/hydrophobicity scale of amino acids. The output is the rough estimate of the hydrophobicity of aminoacids sequence (the result is rounded to two decimal places). A value less than 0 indicates hydrophobicity; a value greater than 0 indicates hydrophilicity.
+
+#### run_fastq_tools  
+
+-   `gc_bounds`  
+
+Composition GC interval (in percent) for filtering. Default is `tuple` (0, 100). When passing a single number as an argument, it is considered an upper bound. For example, `gc_bounds = (20, 80)` save only reads with GC content from 20 to 80%, `gc_bounds = 50`  save reads with GC content less than or equal to 50%.
 :exclamation: When specifying only the upper bound, use `int` or `float`
 
--   `length_bounds`  Length interval for filtering.  Default is `tuple` (0, 2**32). When passing a single number as an argument, it is considered an upper bound. For example, `length_bounds = (150, 500)` save only reads with length from 150 to 500 bp, `length_bounds = 400`  save reads with length less than or equal to 400 bp.
+-   `length_bounds` 
+
+Length interval for filtering.  Default is `tuple` (0, 2**32). When passing a single number as an argument, it is considered an upper bound. For example, `length_bounds = (150, 500)` save only reads with length from 150 to 500 bp, `length_bounds = 400`  save reads with length less than or equal to 400 bp.
 :exclamation: When specifying only the upper bound, use `int` or `float`
 
--   `quality_threshold`  The threshold value of average read quality for filtering. Default is 0 (`int`) in Phred33 scale. Reads with average quality across all nucleotides **below** the threshold will be discarded.
+-   `quality_threshold` 
+
+The threshold value of average read quality for filtering. Default is 0 (`int`) in Phred33 scale. Reads with average quality across all nucleotides **below** the threshold will be discarded.
 
 ## Troubleshooting
 
