@@ -21,7 +21,7 @@ import run_bseq
 ```
 And then run the required function, adding its name and input arguments after the dot, for example:
 ```python
-run_bseq.run_dna_rna_tools('ATGC', operation = 'complement')  # command
+run_bseq.run_dna_rna_tools('ATgC', operation = 'complement')  # command
 
 'TAcG'  # result
 ```
