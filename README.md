@@ -4,13 +4,13 @@
 
 ***bseq-kit*** is a mini-program that allows the user to work with nucleotide and amino acid sequences, as well as fastq format data. This tool contains three semantic and functional blocks:
 
-## :round_pushpin: run_dna_rna_tools
+#### :round_pushpin: run_dna_rna_tools
 Block for working with nucleotide sequences. It can converts a DNA/RNA sequence into its reverse, complement, reverse-complement form, or translate to its trancribe form.
 
-## :round_pushpin: run_amino_acid_tools
+#### :round_pushpin: run_amino_acid_tools
 Block for working with amino acid sequences. Calculates the molecular weight of a sequence or its amino acid composition.
 
-## :round_pushpin: run_fastq_tools
+#### :round_pushpin: run_fastq_tools
 Block for working with fastq format. Filters fastq-sequences based on user-specified conditions.
 
 ## Usage
