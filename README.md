@@ -4,24 +4,24 @@
 
 ***bseq-kit*** is a mini-program that allows the user to work with nucleotide and amino acid sequences, as well as fastq format data. This tool contains three semantic and functional blocks:
 
-### :round_pushpin: run_dna_rna_tools
+#### :round_pushpin: run_dna_rna_tools
 Block for working with nucleotide sequences. It can converts a DNA/RNA sequence into its reverse, complement, reverse-complement form, or translate to its trancribe form.
 
-### :round_pushpin: run_amino_acid_tools
+#### :round_pushpin: run_amino_acid_tools
 Block for working with amino acid sequences. Calculates the molecular weight of a sequence or its amino acid composition.
 
-### :round_pushpin: run_fastq_tools
+#### :round_pushpin: run_fastq_tools
 Block for working with fastq format. Filters fastq-sequences based on user-specified conditions.
 
 ## Usage
 
-To use AminoAcidTools simply import `run_tools` into your `*.py` script as shown below:
+To use AminoAcidTools simply import `run_bseq` into your `*.py` script as shown below:
 ```python
-import run_tools
+import run_bseq
 ```
 And then run the required function, adding its name and input arguments after the dot, for example:
 ```python
-run_tools.run_dna_rna_tools('ATGC', operation = 'complement')  # command
+run_bseq.run_dna_rna_tools('ATGC', operation = 'complement')  # command
 
 'TAcG'  # result
 ```
@@ -35,7 +35,7 @@ The program has two required input parameters:
 * `operation = 'option'` Name of the operation to be executed, keyword argument (`str` type):
 
 ```python
-run_tools.run_dna_rna_tools('AGTtC', 'GTT', operation = 'reverse')  # correct
+run_bseq.run_dna_rna_tools('AGTtC', 'GTT', operation = 'reverse')  # correct
 ```
 
 :exclamation: You must use one of predefined operation names described in the "Options" section below.
@@ -47,7 +47,7 @@ The program has two required input parameters:
 * `operation = 'option'` Name of the operation to be executed, keyword argument (`str` type):
 
 ```python
-run_tools.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')  # correct
+run_bseq.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')  # correct
 ```
 
 :exclamation: You must use one of predefined operation names described in the "Options" section below.
@@ -60,7 +60,7 @@ The program has one required input parameter:
 The remaining arguments indicate filtering conditions. For filtering parameters you can leave the default values or change it.  Operation to filtering described in the "Options" section below.
 
 ```python
-run_tools.run_fastq_tools(seqs = {
+run_bseq.run_fastq_tools(seqs = {
     # 'name' : ('sequence', 'quality')
    '@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA', 'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
     '@SRX079804:1:SRR292678:1:1101:24563:24563': ('ATTAGCGAGGAGGAGTGCTGAGAAGATGTCGCCTACGCCGTTGAAATTCCCTTCAATCAGGGGGTACTGGAGGATACGAGTTTGTGTG', 'BFFFFFFFB@B@A<@D>BDDACDDDEBEDEFFFBFFFEFFDFFF=CC@DDFD8FFFFFFF8/+.2,@7<<:?B/:<><-><@.A*C>D'),
@@ -76,10 +76,10 @@ run_tools.run_fastq_tools(seqs = {
 `str` If one sequence is given as input, `list` if two or more sequences are submitted:
 
 ```python
-run_tools.run_dna_rna_tools('AGTtC', 'GTT', operation = 'reverse')
+run_bseq.run_dna_rna_tools('AGTtC', 'GTT', operation = 'reverse')
 ['CtTGA', 'TTG']
 
-run_tools.run_dna_rna_tools('GGTca', operation = 'transcribe')
+run_bseq.run_dna_rna_tools('GGTca', operation = 'transcribe')
 'GGUca'
 ```
 
@@ -89,10 +89,10 @@ run_tools.run_dna_rna_tools('GGTca', operation = 'transcribe')
 *Please note*, when using the `calculate_amino_acid_percentage` operation, a `list[dict]` is always returned as output:
 
 ```python
-run_tools.run_amino_acid_tools('ARDF', operation = 'calculate_amino_acid_percentage')
+run_bseq.run_amino_acid_tools('ARDF', operation = 'calculate_amino_acid_percentage')
 [{'A': 25.0, 'R': 25.0, 'D': 25.0, 'F': 25.0}]
 
-run_tools.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')  
+run_bseq.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')  
 [507.54]
 ```
 
@@ -101,7 +101,7 @@ run_tools.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')
 `dict` which consisting only of those sequences that passed all the specified conditions: 
 
 ```python
-run_tools.run_fastq_tools(seqs = {
+run_bseq.run_fastq_tools(seqs = {
     # 'name' : ('sequence', 'quality')
    '@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA', 'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
     '@SRX079804:1:SRR292678:1:1101:24563:24563': ('ATTAGCGAGGAGGAGTGCTGAGAAGATGTCGCCTACGCCGTTGAAATTCCCTTCAATCAGGGGGTACTGGAGGATACGAGTTTGTGTG', 'BFFFFFFFB@B@A<@D>BDDACDDDEBEDEFFFBFFFEFFDFFF=CC@DDFD8FFFFFFF8/+.2,@7<<:?B/:<><-><@.A*C>D'),
@@ -184,10 +184,10 @@ For `run_amino_acid_tools` the correctness of the amino acid sequence is checked
 The name of the operation is also checked. If an error is detected, the program will be interrupted and a corresponding message will be displayed on the screen:
 
 ```python
-run_tools.run_dna_rna_tools('AGTUU', operation = 'reverse')  # incorrect input sequence
+run_bseq.run_dna_rna_tools('AGTUU', operation = 'reverse')  # incorrect input sequence
 ValueError: Incorrect sequence
 
-run_tools.run_amino_acid_tools('ARDF', operation = 'percentage')  # incorrect operation
+run_bseq.run_amino_acid_tools('ARDF', operation = 'percentage')  # incorrect operation
 ValueError: Incorrect operation
 ```
 #
