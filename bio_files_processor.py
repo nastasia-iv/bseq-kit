@@ -16,7 +16,7 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta: str = '')
         None
     """
     if output_fasta == '':  # Если имя output не задано, используем имя input c _oneline
-        output_fasta = input_fasta.replace('.', '_oneline.fasta')
+        output_fasta = input_fasta.replace('.fasta', '_oneline.fasta')
     else:  # Если имя output задано, проверим расширение
         if not output_fasta.endswith(".fasta"):
             output_fasta += ".fasta"
