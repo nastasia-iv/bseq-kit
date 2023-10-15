@@ -64,7 +64,7 @@ The program has one required input parameter:
 The remaining arguments indicate filtering conditions. For filtering parameters you can leave the default values or change it.  Operation to filtering described in the "Options" section below.
 
 ```python
-run_fastq_tools(input_path = '/work_dir/example.fastq', gc_bounds = (20, 50), length_bounds = (90), quality_threshold = 30)  # correct
+run_bseq.run_fastq_tools(input_path = './work_dir/example.fastq', gc_bounds = (20, 50), length_bounds = (90), quality_threshold = 30)  # correct
 ```
 
 #### bio_files_processor
@@ -77,7 +77,7 @@ Path to fasta-file for convert (`str` type).
 Optional argument. A new fasta file in which each sequence fits on one line. If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
 
 ```python
-bio_files_processor.convert_multiline_fasta_to_oneline(input_fasta = '/example_dir/example_multiline_fasta.fasta')  # correct
+bio_files_processor.convert_multiline_fasta_to_oneline(input_fasta = './example_dir/example_multiline_fasta.fasta')  # correct
 ```
 
 ##### select_genes_from_gbk_to_fasta
@@ -96,7 +96,7 @@ Name of the output file. Optional argument.
 If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
 
 ```python
-bio_files_processor.select_genes_from_gbk_to_fasta(input_gbk = 'example.gbk', genes = ('rseB', 'nimR'), n_before = 1, n_after = 1)  # correct
+bio_files_processor.select_genes_from_gbk_to_fasta(input_gbk = './wokr_dir/example.gbk', genes = ('rseB', 'nimR'), n_before = 1, n_after = 1)  # correct
 ```
 
 ### :outbox_tray: Output
