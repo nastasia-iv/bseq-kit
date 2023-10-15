@@ -1,8 +1,7 @@
 from typing import List, Union
-
 from modules_to_run.modules_dna_rna_tools import reverse, transcribe, complement, reverse_complement
 from modules_to_run.modules_amino_acid_tools import operation_dict
-from modules_to_run.modules_fastq_tools import calculate_average_quality, calculate_gc_content, calculate_sequence_length
+from modules_to_run.modules_fastq_tools import rewrite_fastq_to_dict, calculate_average_quality, calculate_gc_content, calculate_sequence_length, save_dict_to_fastq
 
 nucleotides = {'A', 'T', 'G', 'C', 'U', 'a', 't', 'g', 'c', 'u'}
 
@@ -97,34 +96,35 @@ def run_amino_acid_tools(*seqs: str, operation: str = '') -> list:
     return output
 
 
-def run_fastq_tools(seqs: dict, gc_bounds: Union[tuple, int] = (0, 100), length_bounds: Union[tuple, int, float] = (0, 2**32), quality_threshold: int = 0) -> dict:
+def run_fastq_tools(input_path: str, output_filename: str = '', gc_bounds: Union[tuple, int] = (0, 100), length_bounds: Union[tuple, int, float] = (0, 2**32), quality_threshold: int = 0) -> str:
     """
     Run FastqTools (to checks each fastq sequence in the dict 'seqs' against the specified conditions)
 
     Arguments:
-    - seqs (dict): fastq sequences to check
+    - input_path (str): path to file with fastq sequences to check
+    - output_filename (str): optional, name of the file to save the result
     - gc_bounds (Union[tuple, int, float]): GC composition interval (percents) to filter, default is (0, 100); if one value is passed, it's considered the upper limit
     - length_bounds (Union[tuple, int]): sequence length interval to filter, default is (0, 2**32); if one value is passed, it's considered the upper limit
     - quality_threshold (int): threshold value of average read quality (phred33) to filter, default is 0
 
     Return:
-    - dict, including fastq sequences that have passed all the conditions
+    - str: path for filtered file
     """
-    # process gc_bounds conditions
+    # Обрабатываем границы ГЦ-состава
     if isinstance(gc_bounds, (float, int)):
         gc_min = 0
         gc_max = gc_bounds
     else:
         gc_min = gc_bounds[0]
         gc_max = gc_bounds[1]
-    # process length_bounds conditions
+    # Обрабатываем границы по длине
     if isinstance(length_bounds, int):
         length_min = 0
         length_max = length_bounds
     else:
         length_min = length_bounds[0]
         length_max = length_bounds[1]
-
+    seqs = rewrite_fastq_to_dict(input_path)  # переводим fastq в словарь
     gc_filtered_seqs: dict = {}
     length_filtered_seqs: dict = {}
     all_filtered_seqs: dict = {}
@@ -137,4 +137,4 @@ def run_fastq_tools(seqs: dict, gc_bounds: Union[tuple, int] = (0, 100), length_
     for seq_name, seq_and_quality in length_filtered_seqs.items():
         if quality_threshold <= calculate_average_quality(seqs.get(seq_name)[-1]):
             all_filtered_seqs[seq_name] = seq_and_quality
-    return all_filtered_seqs
+    return save_dict_to_fastq(all_filtered_seqs, input_path, output_filename)
