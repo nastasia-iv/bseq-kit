@@ -76,6 +76,10 @@ Path to fasta-file for convert (`str` type).
 * `output_fasta`
 Optional argument. A new fasta file in which each sequence fits on one line. If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
 
+```python
+bio_files_processor.convert_multiline_fasta_to_oneline(input_fasta = '/example_dir/example_multiline_fasta.fasta')  # correct
+```
+
 ##### select_genes_from_gbk_to_fasta
 * `input_gbk`
 Path to the input GBK file.
