@@ -13,17 +13,20 @@ Block for working with amino acid sequences. Calculates the molecular weight of 
 #### :round_pushpin: run_fastq_tools
 Block for working with fastq format. Filters fastq-sequences based on user-specified conditions.
 
+#### :round_pushpin: bio_files_processor
+Block for searching sequences in a gbk file and for converting multi-line fasta files into single-line ones.
+
 ## Usage
 
-To use AminoAcidTools simply import `run_bseq` into your `*.py` script as shown below:
+To use *run_** modules simply import `run_bseq` into your `*.py` script as shown below:
 ```python
 import run_bseq
 ```
-And then run the required function, adding its name and input arguments after the dot, for example:
-```python
-run_bseq.run_dna_rna_tools('ATGC', operation = 'complement')  # command
 
-'TAcG'  # result
+
+To use `bio_files_processor` simply import it into your `*.py` script as shown below:
+```python
+import bio_files_processor
 ```
 
 ### :inbox_tray: Input
@@ -52,21 +55,41 @@ run_bseq.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight') 
 
 :exclamation: You must use one of predefined operation names described in the "Options" section below.
 
+
 #### run_fastq_tools
 
 The program has one required input parameter:
-* `seqs` Fastq-sequences, variable argument. The *key* is the name of the sequences. The *value* is a tuple of two strings: sequence and quality  (`dict` type). 
+* `input_path` Fastq-file with reads that need to be filtered  (`str` type). 
 
 The remaining arguments indicate filtering conditions. For filtering parameters you can leave the default values or change it.  Operation to filtering described in the "Options" section below.
 
 ```python
-run_bseq.run_fastq_tools(seqs = {
-    # 'name' : ('sequence', 'quality')
-   '@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA', 'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
-    '@SRX079804:1:SRR292678:1:1101:24563:24563': ('ATTAGCGAGGAGGAGTGCTGAGAAGATGTCGCCTACGCCGTTGAAATTCCCTTCAATCAGGGGGTACTGGAGGATACGAGTTTGTGTG', 'BFFFFFFFB@B@A<@D>BDDACDDDEBEDEFFFBFFFEFFDFFF=CC@DDFD8FFFFFFF8/+.2,@7<<:?B/:<><-><@.A*C>D'),
-    '@SRX079804:1:SRR292678:1:1101:30161:30161': ('GAACGACAGCAGCTCCTGCATAACCGCGTCCTTCTTCTTTAGCGTTGTGCAAAGCATGTTTTGTATTACGGGCATCTCGAGCGAATC', 'DFFFEGDGGGGFGGEDCCDCEFFFFCCCCCB>CEBFGFBGGG?DE=:6@=>A<A>D?D8DCEE:>EEABE5D@5:DDCA;EEE-DCD')
-    }, gc_bounds = (20, 50), length_bounds = (90), quality_threshold = 30)  # correct
+run_fastq_tools(input_path = '/work_dir/example.fastq', gc_bounds = (20, 50), length_bounds = (90), quality_threshold = 30)  # correct
 ```
+
+#### bio_files_processor
+
+##### convert_multiline_fasta_to_oneline
+* `input_fasta` 
+Path to fasta-file for convert (`str` type). 
+
+* `output_fasta`
+Optional argument. A new fasta file in which each sequence fits on one line. If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
+
+##### select_genes_from_gbk_to_fasta
+* `input_gbk`
+Path to the input GBK file.
+
+* `genes` 
+Genes of interest, next to which neighbors are searched.
+:exclamation:  At least 2 genes must be passed on.
+
+* `n_before`, `n_after` 
+Number of genes before and after (>0). Default values are 1.
+
+* `output_fasta` 
+Name of the output file. Optional argument. 
+If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
 
 
 ### :outbox_tray: Output
@@ -98,21 +121,17 @@ run_bseq.run_amino_acid_tools('ARDF', operation = 'calculate_molecular_weight')
 
 #### run_fastq_tools
 
-`dict` which consisting only of those sequences that passed all the specified conditions: 
+New fastq-file which consisting only of those sequences that passed all the specified conditions. The filtered data will be saved to the `fastq_filtrator_results` folder (if it does not exist, it will be created automatically). 
 
-```python
-run_bseq.run_fastq_tools(seqs = {
-    # 'name' : ('sequence', 'quality')
-   '@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA', 'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
-    '@SRX079804:1:SRR292678:1:1101:24563:24563': ('ATTAGCGAGGAGGAGTGCTGAGAAGATGTCGCCTACGCCGTTGAAATTCCCTTCAATCAGGGGGTACTGGAGGATACGAGTTTGTGTG', 'BFFFFFFFB@B@A<@D>BDDACDDDEBEDEFFFBFFFEFFDFFF=CC@DDFD8FFFFFFF8/+.2,@7<<:?B/:<><-><@.A*C>D'),
-    '@SRX079804:1:SRR292678:1:1101:30161:30161': ('GAACGACAGCAGCTCCTGCATAACCGCGTCCTTCTTCTTTAGCGTTGTGCAAAGCATGTTTTGTATTACGGGCATCTCGAGCGAATC', 'DFFFEGDGGGGFGGEDCCDCEFFFFCCCCCB>CEBFGFBGGG?DE=:6@=>A<A>D?D8DCEE:>EEABE5D@5:DDCA;EEE-DCD')
-    }, gc_bounds = (20, 50), length_bounds = (90), quality_threshold = 30)
+ #### bio_files_processor
+ 
+* #### convert_multiline_fasta_to_oneline
+Fasta file in which each sequence fits into one line.
 
-{'@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA',
-  'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
- '@SRX079804:1:SRR292678:1:1101:30161:30161': ('GAACGACAGCAGCTCCTGCATAACCGCGTCCTTCTTCTTTAGCGTTGTGCAAAGCATGTTTTGTATTACGGGCATCTCGAGCGAATC',
-  'DFFFEGDGGGGFGGEDCCDCEFFFFCCCCCB>CEBFGFBGGG?DE=:6@=>A<A>D?D8DCEE:>EEABE5D@5:DDCA;EEE-DCD')}
-```
+ * #### select_genes_from_gbk_to_fasta
+Fasta file containing protein sequences of gene neighbors for specified genes of interest.
+
+
 
 ## Options
 
@@ -163,6 +182,11 @@ Calculate estimation of hydrophilicity/hydrophobicity of amino acid sequences. T
 
 #### run_fastq_tools  
 
+-   `output_filename`  
+
+Optional argument. Name for the new file with filtered reads.
+If the `output_filename` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_filename`, the function will automatically add the extension `.fastq`.
+
 -   `gc_bounds`  
 
 Composition GC interval (in percent) for filtering. Default is `tuple` (0, 100). When passing a single number as an argument, it is considered an upper bound. For example, `gc_bounds = (20, 80)` save only reads with GC content from 20 to 80%, `gc_bounds = 50`  save reads with GC content less than or equal to 50%.
@@ -175,7 +199,8 @@ Length interval for filtering.  Default is `tuple` (0, 2**32). When passing a si
 
 -   `quality_threshold` 
 
-The threshold value of average read quality for filtering. Default is 0 (`int`) in Phred33 scale. Reads with average quality across all nucleotides **below** the threshold will be discarded.
+The threshold value of average read quality for filtering. Default is 0 (`int`) in Phred33 scale. Reads with average quality across all nucleotides below the threshold will be discarded.
+
 
 ## Troubleshooting
 
