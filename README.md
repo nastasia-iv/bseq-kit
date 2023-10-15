@@ -91,6 +91,9 @@ Number of genes before and after (>0). Default values are 1.
 Name of the output file. Optional argument. 
 If the `output_fasta` parameter is not passed, then the name of the input file is taken instead. If you do not add a file extension to `output_fasta`, the function will automatically add the extension `.fasta`.
 
+```python
+bio_files_processor.select_genes_from_gbk_to_fasta(input_gbk = 'example.gbk', genes = ('rseB', 'nimR'), n_before = 1, n_after = 1)  # correct
+```
 
 ### :outbox_tray: Output
 
