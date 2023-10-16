@@ -1,7 +1,33 @@
 from typing import List, Union
 
+nucleotides = {'A', 'T', 'G', 'C', 'U', 'a', 't', 'g', 'c', 'u'}
 
-def reverse(seqs: str) -> Union[str, List]:
+
+def is_dna_rna(seq: str) -> bool:
+    """
+    Checks whether the string is DNA/RNA or not
+
+        Arguments:
+    - seq (str): sequence(-s) for processing
+
+        Return:
+    - bool, if string is DNA/RNA; throws an error if it not
+    """
+    t_count = 0
+    u_count = 0
+    for nucleotide in seq:
+        if nucleotide not in nucleotides:
+            raise ValueError('Incorrect nucleotide sequence')
+        if nucleotide.upper() == 'T':
+            t_count += 1
+        if nucleotide.upper() == 'U':
+            u_count += 1
+    if t_count != 0 and u_count != 0:
+        raise ValueError('Incorrect nucleotide sequence')
+    return True
+
+
+def reverse(seqs: tuple) -> Union[str, List]:
     """
     Reverses the nucleotide sequence
     Arguments:
@@ -20,7 +46,7 @@ def reverse(seqs: str) -> Union[str, List]:
         return reverse_list
 
 
-def transcribe(seqs: str) -> Union[str, List]:
+def transcribe(seqs: tuple) -> Union[str, List]:
     """
     Transcribes the nucleotide sequence
     Arguments:
@@ -32,16 +58,15 @@ def transcribe(seqs: str) -> Union[str, List]:
     """
     transcribe_list = list()
     for seq in seqs:
-        seq_str = ''.join(seq)
-        for nucleotide in seq_str:
-            seq_str = seq_str.replace('T', 'U').replace('t', 'u')
-        transcribe_list.append(seq_str)
+        for nucleotide in seq:
+            seq = seq.replace('T', 'U').replace('t', 'u')
+        transcribe_list.append(seq)
     if len(transcribe_list) > 1:
         return transcribe_list
     return transcribe_list[0]
 
 
-def complement(seqs: str) -> Union[str, List]:
+def complement(seqs: tuple) -> Union[str, List]:
     """
     Сomplements the nucleotide sequence
     Arguments:
@@ -53,11 +78,10 @@ def complement(seqs: str) -> Union[str, List]:
     """
     complement_list = list()
     for seq in seqs:
-        seq_str = ''.join(seq)
         complement_pairs = {'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G', 'U': 'A',
                             'a': 't', 't': 'a', 'g': 'c', 'c': 'g', 'u': 'a'}
         complement_str = ""
-        for nucleotide in seq_str:
+        for nucleotide in seq:
             complement_str += complement_pairs[nucleotide]  # go letter by letter and rewrite the corresponding values from the dictionary
         complement_list.append(complement_str)
     if len(complement_list) > 1:
@@ -65,7 +89,7 @@ def complement(seqs: str) -> Union[str, List]:
     return complement_list[0]
 
 
-def reverse_complement(seqs: str) -> Union[str, List]:
+def reverse_complement(seqs: tuple) -> Union[str, List]:
     """
     Reverses and complements the nucleotide sequence
     Arguments:
