@@ -11,15 +11,15 @@ def rewrite_fastq_to_dict(input_path: str) -> dict:
      Returns:
          dict: dictionary with the reads in FASTQ format
      """
-    sequences = {}  # Инициализируем пустой словарь для хранения данных
+    seqs = {}  # Инициализируем пустой словарь для хранения данных
     with open(input_path, mode="r") as file:
         for line in file:
-            seq_id = line.strip()  # Считываем идентификатор, который является первой строкой
-            sequence = next(file).strip()  # Считываем последовательность, следующую за идентификатором
+            seq_name = line.strip()  # Считываем идентификатор, который является первой строкой
+            seq = next(file).strip()  # Считываем последовательность, следующую за идентификатором
             comment = next(file).strip()  # Считываем комментарий, следующий за последовательностью
             seq_quality = next(file).strip()  # Считываем строку с качеством, следующую за комментарием
-            sequences[seq_id] = (sequence, comment, seq_quality)  # Добавляем кортеж значений в словарь
-    return sequences
+            seqs[seq_name] = (seq, comment, seq_quality)  # Добавляем кортеж значений в словарь
+    return seqs
 
 
 def calculate_average_quality(seq: str) -> int:
@@ -34,7 +34,7 @@ def calculate_average_quality(seq: str) -> int:
     """
     converted_sequence_quality = []  # for sequence quality values after conversion
     for base in seq:
-        base_quality = (ord(base)) - 33
+        base_quality = ord(base) - 33
         converted_sequence_quality.append(base_quality)
     average_quality = (sum(converted_sequence_quality) // len(converted_sequence_quality))
     return average_quality
@@ -50,7 +50,7 @@ def calculate_gc_content(seq: str) -> float:
     Return:
        int, sequence GC composition
     """
-    gc_content = round(((seq.count('G') + seq.count('C')) * 100) / len(seq), 1)
+    gc_content = round(((seq.upper().count('G') + seq.upper().count('C')) * 100) / len(seq), 1)
     return gc_content
 
 
