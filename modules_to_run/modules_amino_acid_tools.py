@@ -1,5 +1,22 @@
 from typing import Dict
 
+one_letter_aminoacids = {
+    'A', 'R', 'N', 'D', 'C', 'H', 'G', 'Q', 'E', 'I',
+    'L', 'K', 'M', 'P', 'S', 'Y', 'T', 'W', 'F', 'V'
+}
+
+
+def is_peptide(seq: str) -> bool:
+    """
+    Check whether the incoming sequence is an aminoacid
+    Arguments:
+        - seq (str): sequence for processing
+
+    Return:
+        - bool: result of the check
+    """
+    return set(seq).issubset(one_letter_aminoacids)
+
 
 def calculate_amino_acid_percentage(seq: str) -> Dict[str, float]:
     """
@@ -122,7 +139,7 @@ def calculate_pI(seq: str) -> float:
     return round(pI, 2)
 
 
-operation_dict = {
+operations_with_aminoacid = {
     'calculate_molecular_weight': calculate_molecular_weight,
     'calculate_amino_acid_percentage': calculate_amino_acid_percentage,
     'calculate_hydrophobicity_eisenberg': calculate_hydrophobicity_eisenberg,
