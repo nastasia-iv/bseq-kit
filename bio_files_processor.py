@@ -27,8 +27,7 @@ def convert_multiline_fasta_to_oneline(input_fasta: str, output_fasta: str = '')
             line = line.strip()
             if line.startswith(">"):
                 if current_sequence:  # Если временный список не пуст
-                    output_lines.append(
-                        "".join(current_sequence))  # Сливаем все последовательности в одну в финальный список
+                    output_lines.append("".join(current_sequence))  # Сливаем все последовательности в одну в финальный список
                 output_lines.append(line)  # Добавляем идентификатор в финальный список
                 current_sequence = []  # Очищаем временный список
             else:
@@ -66,10 +65,10 @@ def select_genes_from_gbk_to_fasta(input_gbk: str, genes: Tuple[str], n_before: 
             # Блок для создания списка генов и словаря
     gene_protein_dict = {}  # Создаем пустой словарь для хранения информации о генах
     with open(input_gbk, mode="r") as input_file:
-        current_gene = None
-        current_translation = None
+        current_gene = None  # Строка для текущего гена
+        current_translation = None  # Строка для трансляции текущего гена
         in_gene = False
-        gene_list = []
+        gene_list = []  # Список названий генов
         for line in input_file:
             line = line.strip()
             if line.startswith("/gene="):  # Ищем название гена
@@ -79,8 +78,7 @@ def select_genes_from_gbk_to_fasta(input_gbk: str, genes: Tuple[str], n_before: 
                 gene_list.append(line)  # Добавляем чистое имя гена в список генов
                 in_gene = True
             elif in_gene and line.startswith("/translation="):  # Если нашли ген, ищем белковую последовательность
-                current_translation = line.split("=")[1].strip(
-                    '"')  # Разделитель =, берем только элемент 1, откусываем " в строке
+                current_translation = line.split("=")[1].strip('"')  # Разделитель =, берем только элемент 1, откусываем " в строке
                 while not line.endswith('"'):  # Пока не найден конец последовательности
                     line = input_file.readline().strip()  # Читаем следующую строку
                     current_translation += line.strip('"')
