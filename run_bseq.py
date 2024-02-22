@@ -127,7 +127,7 @@ class BiologicalSequence(ABC):
         pass
 
     @abstractmethod
-    def alphabet_is_valid_(self) -> bool:
+    def alphabet_is_valid(self) -> bool:
         pass
 
 
@@ -151,8 +151,7 @@ class NucleicAcidSequence(BiologicalSequence):
             return set(self._sequence).issubset(dna_alphabet)
         if isinstance(self, RNASequence):
             return set(self._sequence).issubset(rna_alphabet)
-        else:
-            return False
+        return False
 
     def complement(self) -> 'NucleicAcidSequence':
         complement_pairs = {
