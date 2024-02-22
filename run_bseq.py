@@ -1,69 +1,61 @@
 from typing import List, Union
-from modules_to_run.modules_dna_rna_tools import is_dna_rna, reverse, transcribe, complement, reverse_complement
-from modules_to_run.modules_amino_acid_tools import is_peptide, operations_with_aminoacid
-from modules_to_run.modules_fastq_tools import rewrite_fastq_to_dict, calculate_average_quality, calculate_gc_content, calculate_sequence_length, save_dict_to_fastq
+from abc import ABC, abstractmethod
+import os
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqUtils import GC
 
 
-def run_dna_rna_tools(*seqs: str, operation: str = '') -> Union[str, List]:
+def calculate_gc_content(seq: Seq) -> float:
     """
-    Run DnaRnaTools (to performs standard operations with nucleotide sequences)
+    Calculate the GC content of a nucleotide sequence.
 
     Arguments:
-    - seqs (str): one or more sequences for processing
-    - operation (str): name of the operation to be performed (reverse, transcribe, complement, reverse_complement)
+        seq (Seq): Biological sequence.
 
-    Return:
-    - str, for one sequence to be processing
-    - list, for two or more sequences to be processing
+    Returns:
+        float: GC content as a percentage.
     """
-    for seq in seqs:
-        is_dna_rna(seq)
-    # start the required operation
-    if operation == 'reverse':
-        return reverse(seqs)
-    if operation == 'transcribe':
-        return transcribe(seqs)
-    if operation == 'complement':
-        return complement(seqs)
-    if operation == 'reverse_complement':
-        return reverse_complement(seqs)
-    raise ValueError('Incorrect operation')
+    return GC(seq)
 
 
-def run_amino_acid_tools(*seqs: str, operation: str) -> list:
+def calculate_average_quality(seq: Seq) -> float:
     """
-    Run AminoAcid Tools (to calculate the molecular weight of a sequence(-s) or find out the percentage of amino acids)
+    Calculate the average quality of a nucleotide sequence.
 
     Arguments:
-    - *seqs (str): one or more string sequences to be analyzed
-    - operation (str): action to be done with sequence(-s)
+        seq (Seq): Biological sequence.
 
     Return:
-    - list with the result of operation
+        float: Average sequence quality according to the phred33 scale.
     """
-    if operation not in operations_with_aminoacid:
-        raise ValueError('Incorrect operation')
-    output = []
-    for seq in seqs:
-        is_peptide(seq)
-        output.append(operations_with_aminoacid[operation](seq))
-    return output
+    return sum(seq.letter_annotations["phred_quality"]) / len(seq)   # обращаемся к методу letter_annotations из Bio.SeqRecord
 
 
-def run_fastq_tools(input_path: str, output_filename: str = '', gc_bounds: Union[tuple, int] = (0, 100), length_bounds: Union[tuple, int, float] = (0, 2**32), quality_threshold: int = 0) -> str:
+def filter_fastq(
+    input_path: str,
+    output_filename: str = '',
+    gc_bounds: Union[tuple, int, float] = (0, 100),
+    length_bounds: Union[tuple, int] = (0, 2**32),
+    quality_threshold: int = 0
+) -> str:
     """
-    Run FastqTools (to checks each fastq sequence in the dict 'seqs' against the specified conditions)
+    Filter FASTQ records based on specified criteria and save them to a new file.
 
     Arguments:
-    - input_path (str): path to file with fastq sequences to check
-    - output_filename (str): optional, name of the file to save the result
-    - gc_bounds (Union[tuple, int, float]): GC composition interval (percents) to filter, default is (0, 100); if one value is passed, it's considered the upper limit
-    - length_bounds (Union[tuple, int]): sequence length interval to filter, default is (0, 2**32); if one value is passed, it's considered the upper limit
-    - quality_threshold (int): threshold value of average read quality (phred33) to filter, default is 0
+        input_path (str): Path to the FASTQ file.
+        output_filename (str): Optional, file name to save the result.
+        gc_bounds (Union[tuple, int, float]): GC composition interval (percents) to filter, default is (0, 100).
+        length_bounds (Union[tuple, int]): Sequence length interval to filter, default is (0, 2**32).
+        quality_threshold (int): Threshold value of average read quality (phred33) to filter, default is 0.
 
     Return:
-    - str: path for filtered file
+        str: Path for filtered file.
     """
+    records = list(SeqIO.parse(input_path, "fastq"))  # 1 элемент списка = 1 последовательноть формата fastq
+
+    filtered_records = []
+
     # Обрабатываем границы ГЦ-состава
     if isinstance(gc_bounds, (float, int)):
         gc_min = 0
@@ -71,6 +63,7 @@ def run_fastq_tools(input_path: str, output_filename: str = '', gc_bounds: Union
     else:
         gc_min = gc_bounds[0]
         gc_max = gc_bounds[1]
+
     # Обрабатываем границы по длине
     if isinstance(length_bounds, int):
         length_min = 0
@@ -78,23 +71,159 @@ def run_fastq_tools(input_path: str, output_filename: str = '', gc_bounds: Union
     else:
         length_min = length_bounds[0]
         length_max = length_bounds[1]
-    
-    seqs = rewrite_fastq_to_dict(input_path)  # переводим fastq в словарь
 
-    filtered_reads = {}
-
-    for seq_name, values in seqs.items():
-        seq, comment, seq_quality = values
-
-        gc_content = calculate_gc_content(seq)
-        length = calculate_sequence_length(seq)
-        avg_quality = calculate_average_quality(seq_quality)
+    for record in records:
+        gc_content = calculate_gc_content(record.seq)
+        length = len(record)
+        avg_quality = calculate_average_quality(record)
 
         if (
-                gc_min <= gc_content <= gc_max
-                and length_min <= length <= length_max
-                and avg_quality >= quality_threshold
+            gc_min <= gc_content <= gc_max
+            and length_min <= length <= length_max
+            and avg_quality >= quality_threshold
         ):
-            filtered_reads[seq_name] = values
+            filtered_records.append(record)
 
-    return save_dict_to_fastq(filtered_reads, input_path, output_filename)
+    return save_records_to_fastq(filtered_records, output_filename, input_path)
+
+
+def save_records_to_fastq(filtered_records: List[SeqIO.SeqRecord], output_filename: str, input_path: str) -> str:
+    """
+    Save filtered records to a new FASTQ file.
+
+    Arguments:
+        filtered_records (List[SeqIO.SeqRecord]): List of filtered SeqRecords.
+        output_filename (str): Name of the file to save.
+        input_path (str): Path to the original FASTQ file.
+
+    Returns:
+        str: Path to the saved file.
+    """
+    if output_filename == '':  # если имя не передано, используем имя входного файла
+        output_filename = os.path.basename(input_path)
+    if not output_filename.endswith(".fastq"):
+        output_filename += ".fastq"
+    output_dir = 'fastq_filtrator_results'  # задаём имя папки для сохранения результата
+    os.makedirs(output_dir, exist_ok=True)  # создаем папку, если она не существует
+    output_path = os.path.join(output_dir, output_filename)  # задаем путь, по которому сохранится файл
+
+    SeqIO.write(filtered_records, output_path, "fastq")
+
+    return output_path
+
+
+class BiologicalSequence(ABC):
+
+    @abstractmethod
+    def __len__(self) -> int:
+        pass
+
+    @abstractmethod
+    def __getitem__(self, index) -> str:
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+    @abstractmethod
+    def alphabet_is_valid_(self) -> bool:
+        pass
+
+
+class NucleicAcidSequence(BiologicalSequence):
+    def __init__(self, sequence: str):
+        self._sequence = sequence
+
+    def __len__(self) -> int:
+        return len(self._sequence)
+
+    def __getitem__(self, index) -> str:
+        return self._sequence[index]
+
+    def __str__(self) -> str:
+        return self._sequence
+
+    def alphabet_is_valid(self) -> bool:
+        dna_alphabet = set("ATGCatgc")
+        rna_alphabet = set("AGCUagcu")
+        if isinstance(self, DNASequence):
+            return set(self._sequence).issubset(dna_alphabet)
+        if isinstance(self, RNASequence):
+            return set(self._sequence).issubset(rna_alphabet)
+        else:
+            return False
+
+    def complement(self) -> 'NucleicAcidSequence':
+        complement_pairs = {
+            'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G', 'U': 'A',
+            'a': 't', 't': 'a', 'g': 'c', 'c': 'g', 'u': 'a'
+        }
+        complement_sequence = ''
+        for base in self._sequence:
+            complement_sequence += complement_pairs.get(base, base)
+
+        return NucleicAcidSequence(complement_sequence)
+
+    def gc_content(self) -> float:
+        gc_count = 0
+        for base in self._sequence:
+            if base in {'G', 'g', 'C', 'c'}:
+                gc_count += 1
+        total_bases = len(self._sequence)
+        gc_percentage = gc_count / total_bases
+        return gc_percentage
+
+
+class DNASequence(NucleicAcidSequence):
+    def __init__(self, sequence: str):
+        super().__init__(sequence)
+        self._sequence = sequence
+
+    def transcribe(self) -> 'RNASequence':
+        transcribe_sequence = ''
+        for base in self._sequence:
+            if base == 'T':
+                transcribe_sequence += 'U'
+            if base == 't':
+                transcribe_sequence += 'u'
+            else:
+                transcribe_sequence += base
+        return RNASequence(transcribe_sequence)
+
+
+class RNASequence(NucleicAcidSequence):
+    def __init__(self, sequence: str):
+        super().__init__(sequence)
+        self._sequence = sequence
+
+
+class AminoAcidSequence(BiologicalSequence):
+    def __init__(self, sequence: str):
+        self._sequence = sequence
+
+    def __len__(self) -> int:
+        return len(self._sequence)
+
+    def __getitem__(self, index) -> str:
+        return self._sequence[index]
+
+    def __str__(self) -> str:
+        return self._sequence
+
+    def alphabet_is_valid(self) -> bool:
+        amino_acid_alphabet = set("ARNDCHGQEILKMPSYTWFV")
+        return set(self._sequence).issubset(amino_acid_alphabet)
+
+    def calculate_molecular_weight(self) -> float:
+        amino_acid_weights = {
+            'G': 57.051, 'A': 71.078, 'S': 87.077, 'P': 97.115, 'V': 99.131,
+            'T': 101.104, 'C': 103.143, 'I': 113.158, 'L': 113.158, 'N': 114.103,
+            'D': 115.087, 'Q': 128.129, 'K': 128.172, 'E': 129.114, 'M': 131.196,
+            'H': 137.139, 'F': 147.174, 'R': 156.186, 'Y': 163.173, 'W': 186.210
+        }
+        molecular_weight = 0.0
+        for aa in self._sequence:
+            molecular_weight += amino_acid_weights[aa]
+
+        return molecular_weight
