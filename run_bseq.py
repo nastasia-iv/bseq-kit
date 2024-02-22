@@ -162,7 +162,7 @@ class NucleicAcidSequence(BiologicalSequence):
         for base in self._sequence:
             complement_sequence += complement_pairs.get(base, base)
 
-        return NucleicAcidSequence(complement_sequence)
+        return type(self)(complement_sequence)
 
     def gc_content(self) -> float:
         gc_count = 0
