@@ -1,6 +1,6 @@
+import os
 from typing import List, Union
 from abc import ABC, abstractmethod
-import os
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqUtils import GC
