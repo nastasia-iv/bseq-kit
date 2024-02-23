@@ -133,24 +133,24 @@ class BiologicalSequence(ABC):
 
 class NucleicAcidSequence(BiologicalSequence):
     def __init__(self, sequence: str):
-        self._sequence = sequence
+        self.sequence = sequence
 
     def __len__(self) -> int:
-        return len(self._sequence)
+        return len(self.sequence)
 
     def __getitem__(self, index) -> str:
-        return self._sequence[index]
+        return self.sequence[index]
 
     def __str__(self) -> str:
-        return self._sequence
+        return self.sequence
 
     def alphabet_is_valid(self) -> bool:
         dna_alphabet = set("ATGCatgc")
         rna_alphabet = set("AGCUagcu")
         if isinstance(self, DNASequence):
-            return set(self._sequence).issubset(dna_alphabet)
+            return set(self.sequence).issubset(dna_alphabet)
         if isinstance(self, RNASequence):
-            return set(self._sequence).issubset(rna_alphabet)
+            return set(self.sequence).issubset(rna_alphabet)
         return False
 
     def complement(self) -> 'NucleicAcidSequence':
@@ -159,17 +159,17 @@ class NucleicAcidSequence(BiologicalSequence):
             'a': 't', 't': 'a', 'g': 'c', 'c': 'g', 'u': 'a'
         }
         complement_sequence = ''
-        for base in self._sequence:
+        for base in self.sequence:
             complement_sequence += complement_pairs.get(base, base)
 
         return type(self)(complement_sequence)
 
     def gc_content(self) -> float:
         gc_count = 0
-        for base in self._sequence:
+        for base in self.sequence:
             if base in {'G', 'g', 'C', 'c'}:
                 gc_count += 1
-        total_bases = len(self._sequence)
+        total_bases = len(self.sequence)
         gc_percentage = gc_count / total_bases
         return gc_percentage
 
@@ -177,11 +177,11 @@ class NucleicAcidSequence(BiologicalSequence):
 class DNASequence(NucleicAcidSequence):
     def __init__(self, sequence: str):
         super().__init__(sequence)
-        self._sequence = sequence
+        self.sequence = sequence
 
     def transcribe(self) -> 'RNASequence':
         transcribe_sequence = ''
-        for base in self._sequence:
+        for base in self.sequence:
             if base == 'T':
                 transcribe_sequence += 'U'
             if base == 't':
@@ -194,25 +194,25 @@ class DNASequence(NucleicAcidSequence):
 class RNASequence(NucleicAcidSequence):
     def __init__(self, sequence: str):
         super().__init__(sequence)
-        self._sequence = sequence
+        self.sequence = sequence
 
 
 class AminoAcidSequence(BiologicalSequence):
     def __init__(self, sequence: str):
-        self._sequence = sequence
+        self.sequence = sequence
 
     def __len__(self) -> int:
-        return len(self._sequence)
+        return len(self.sequence)
 
     def __getitem__(self, index) -> str:
-        return self._sequence[index]
+        return self.sequence[index]
 
     def __str__(self) -> str:
-        return self._sequence
+        return self.sequence
 
     def alphabet_is_valid(self) -> bool:
         amino_acid_alphabet = set("ARNDCHGQEILKMPSYTWFV")
-        return set(self._sequence).issubset(amino_acid_alphabet)
+        return set(self.sequence).issubset(amino_acid_alphabet)
 
     def calculate_molecular_weight(self) -> float:
         amino_acid_weights = {
@@ -222,7 +222,7 @@ class AminoAcidSequence(BiologicalSequence):
             'H': 137.139, 'F': 147.174, 'R': 156.186, 'Y': 163.173, 'W': 186.210
         }
         molecular_weight = 0.0
-        for aa in self._sequence:
+        for aa in self.sequence:
             molecular_weight += amino_acid_weights[aa]
 
         return molecular_weight
